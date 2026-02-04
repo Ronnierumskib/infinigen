@@ -83,6 +83,6 @@ camera.camera_pose_proposal.pitch = ("clip_gaussian", 90, 30, 20, 160)
 #    -  or, treat your camera rig as multiple camera rigs each with one camera, and implement code to positon them correctly
 camera.spawn_camera_rigs.n_camera_rigs = 1
 camera.spawn_camera_rigs.camera_rig_config = [
-    {'loc': (0, 0, 0), 'rot_euler': (0, 0, 0)},
-    {'loc': (0.075, 0, 0), 'rot_euler': (0, 0, 0)}
+    {'loc': (0, 0, 0), 'rot_euler': (0, 0, 0)}
+#    {'loc': (0.075, 0, 0), 'rot_euler': (0, 0, 0)}
 ]
