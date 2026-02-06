@@ -116,7 +116,7 @@ def main(num_runs: int, start_idx: int, seed: int):
                 sys.executable, "-m", "infinigen_examples.generate_nature",
                 "--task", "fine_terrain",
                 "--seed", f"{seed}",
-                "-g", "base_nature", "simple", "plain", "cuda",
+                "-g", "base_nature", "simple", "plain",#, "cuda",
                 "--input_folder", pop_dir,
                 "--output_folder", popfine_dir
             ]
@@ -124,7 +124,7 @@ def main(num_runs: int, start_idx: int, seed: int):
             step3 = [
                 sys.executable, "-m", "infinigen_examples.generate_nature",
                 "--task", "fine_terrain",
-                "-g", "base_nature", "simple", "plain", "cuda",
+                "-g", "base_nature", "simple", "plain",#, "cuda",
                 "--input_folder", pop_dir,
                 "--output_folder", popfine_dir
             ]

@@ -57,8 +57,8 @@ compose_nature.turbulence_chance = 0
 #Terrain.populated_bounds=(-1, 1, -1, 1, -1, 1)
 #Terrain.bounds=(-2, 2, -2, 2, -2, 2)
 # Terrain.build_terrain_bvh_and_attrs.avoid_border = True # Could help avoid generating large scenes.
-Terrain.populated_bounds=(-25, 25, -25, 25, -5, 25)
-Terrain.bounds=(-200, 200, -200, 200, -200, 200)
+Terrain.populated_bounds=(-50, 50, -75, 75, -5, 25)
+Terrain.bounds=(-400, 400, -400, 400, -400, 400)
 
 compose_nature.center_distance = 100 # Used for creatures. Useless atm.
 
@@ -79,17 +79,17 @@ compose_nature.center_distance = 100 # Used for creatures. Useless atm.
 
 # Changed pose_cameras() in generate_nature
 # Rigs are now translated with code, and n rigs are controlled with:
-camera.spawn_camera_rigs.n_camera_rigs = 3
+camera.spawn_camera_rigs.n_camera_rigs = 1
 fine_terrain.mesher_backend = "OcMesher" # Needed for FOV's larger than 90 deg
 
 # GPU accelerated fine terrain (i think):
-#Terrain.device='cuda'
+Terrain.device='cuda'
 
 # Performance parameters
 OpaqueSphericalMesher.pixels_per_cube = 4 # 4 # High qual = 0.92
 TransparentSphericalMesher.pixels_per_cube = 4 # 4 # High qual = 1.38
 target_face_size.global_multiplier = 2 # 2
-OcMesher.pixels_per_cube = 8 # This is high qual, std=8
+OcMesher.pixels_per_cube = 2 # High qual=4, std=8
 
 execute_tasks.generate_resolution =  (960, 540) # Tried with: (480, 270)
 

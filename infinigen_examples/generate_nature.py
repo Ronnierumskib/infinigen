@@ -274,19 +274,24 @@ def compose_nature(output_folder, scene_seed, **params):
     primary_cams = [rig.children[0] for rig in camera_rigs]
 
     def pose_cameras():
-        rigs_x = [5, 0, -5, 5, 0 ,-5]
-        rigs_z = [2, 2, 2, 10, 10, 10]
-        rigs_rx = [90, 90, 90, 70, 70, 70]
-        
-        for i, rig in enumerate(camera_rigs):
-            rig.location = (rigs_x[i], -25, rigs_z[i])
-            rig.rotation_euler = np.deg2rad(np.array([rigs_rx[i], 0, 0]))
         poses = cam_traj.compute_poses(
             cam_rigs=camera_rigs,
             scene_preprocessed=scene_preprocessed,
             init_bounding_box=bbox,
             terrain_mesh=terrain_mesh,
         )
+        rigs_x = [5, 0, -5, 5, 0 ,-5]
+        rigs_z = [2, 2, 2, 10, 10, 10]
+        rigs_rx = [90, 90, 90, 70, 70, 70]
+        rigs_x = [0, 0, -5, 5, 0 ,-5]
+        rigs_y = [30, 0, 0, 0, 0, 0] # 30
+        rigs_z = [200, 2, 2, 10, 10, 10] # 200
+        rigs_rx = [0, 90, 90, 70, 70, 70]
+        
+        
+        for i, rig in enumerate(camera_rigs):
+            rig.location = (rigs_x[i], rigs_y[i], rigs_z[i])
+            rig.rotation_euler = np.deg2rad(np.array([rigs_rx[i], 0, 90]))
         return poses
 
     poses = p.run_stage("pose_cameras", pose_cameras, use_chance=False)
