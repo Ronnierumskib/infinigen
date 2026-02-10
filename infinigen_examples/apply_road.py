@@ -36,7 +36,7 @@ if terrain is None:
 # Append road asset and set modifiers
 # -----------------------
 #road_blend = "/home/cmo/infinigen_original/RoadWrap.blend"
-road_blend = "/infinigen_examples/RoadWrap.blend"
+road_blend = "infinigen_examples/RoadWrap.blend"
 with bpy.data.libraries.load(road_blend, link=False) as (data_from, data_to):
     data_to.objects = [name for name in data_from.objects if "Road" in name]
 
