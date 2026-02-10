@@ -35,7 +35,8 @@ if terrain is None:
 # -----------------------
 # Append road asset and set modifiers
 # -----------------------
-road_blend = "/home/cmo/infinigen_original/RoadWrap.blend"
+#road_blend = "/home/cmo/infinigen_original/RoadWrap.blend"
+road_blend = "/infinigen_examples/RoadWrap.blend"
 with bpy.data.libraries.load(road_blend, link=False) as (data_from, data_to):
     data_to.objects = [name for name in data_from.objects if "Road" in name]
 
@@ -54,6 +55,7 @@ road_mod["Socket_3"] = -0.15 # Z offset
 # -----------------------
 
 texture_base_path = "/home/cmo/infinigen_original/"  # Adjust this to where your textures are
+texture_path = "/infinigen_examples/"
 
 for img in bpy.data.images:
     if img.filepath and not os.path.exists(bpy.path.abspath(img.filepath)):
@@ -61,12 +63,15 @@ for img in bpy.data.images:
         filename = os.path.basename(img.filepath)
         
         # Try to find the texture in common locations
-        possible_paths = [
-            os.path.join(texture_base_path, filename),
-            os.path.join(texture_base_path, "textures", filename),
-            os.path.join(os.path.dirname(road_blend), filename),
-            os.path.join(os.path.dirname(road_blend), "textures", filename),
-        ]
+        if texture_path:
+            possible_paths = [texture_path]
+        else:
+            possible_paths = [
+                os.path.join(texture_base_path, filename),
+                os.path.join(texture_base_path, "textures", filename),
+                os.path.join(os.path.dirname(road_blend), filename),
+                os.path.join(os.path.dirname(road_blend), "textures", filename),
+            ]
         
         for path in possible_paths:
             if os.path.exists(path):

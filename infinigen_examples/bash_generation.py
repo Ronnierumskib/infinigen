@@ -62,7 +62,7 @@ def main(num_runs: int, start_idx: int, seed: int):
         coarse_dir = f"outputs/Terrains/plain_coarse_{idx}"
         pop_dir = f"outputs/Terrains/plain_pop_{idx}"
         popfine_dir = f"outputs/Terrains/plain_popfine_{idx}"
-        export_dir = f"/mnt/c/isaac-sim/RoadAssets/Terrains/plain_{idx}"
+        export_dir = f"outputs/Terrains/plain_usd_{idx}"
 
         # Step 1: Coarse terrain
         if seed:
