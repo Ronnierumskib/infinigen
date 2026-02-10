@@ -21,8 +21,10 @@ fi
 RUN mkdir /opt/infinigen
 WORKDIR /opt/infinigen
 COPY . .
-RUN conda init bash && \
+RUN conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main && \
+    conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r && \
+    conda init bash && \
     . ~/.bashrc && \
     conda create --name infinigen python=3.11 -y && \
     conda activate infinigen && \
-    pip install -e ".[dev]"
+    pip install -e ".[dev]" --resume-retries 20
