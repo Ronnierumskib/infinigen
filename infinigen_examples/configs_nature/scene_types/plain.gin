@@ -86,10 +86,10 @@ fine_terrain.mesher_backend = "OcMesher" # Needed for FOV's larger than 90 deg
 Terrain.device='cuda'
 
 # Performance parameters
-OpaqueSphericalMesher.pixels_per_cube = 4 # 4 # High qual = 0.92
-TransparentSphericalMesher.pixels_per_cube = 4 # 4 # High qual = 1.38
-target_face_size.global_multiplier = 2 # 2
-OcMesher.pixels_per_cube = 2 # High qual=4, std=8
+OpaqueSphericalMesher.pixels_per_cube = 2 # 4 # High qual = 0.92 # VM optimal: 0.5
+TransparentSphericalMesher.pixels_per_cube = 1.38 # 4 # High qual = 1.38
+target_face_size.global_multiplier = 1 # 2
+OcMesher.pixels_per_cube = 2 # High qual=4, std=8 # VM optimal: 0.5
 
 execute_tasks.generate_resolution =  (960, 540) # Tried with: (480, 270)
 
