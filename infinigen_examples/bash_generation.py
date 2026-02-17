@@ -288,7 +288,7 @@ def main(num_runs: int, start_idx: int, use_seed: bool):
                         seed=seed,
                         summary=summary,
                         summary_key=summary_key,
-                        override_gin_name=label,
+                        override_gin_name="searchspace",
                     )
                 finally:
                     delete_override_gin(override_gin)
