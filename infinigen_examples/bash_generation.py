@@ -24,21 +24,21 @@ from pathlib import Path
 #   ]
 # =============================================================================
 GIN_SEARCH_SPACE: list[tuple[str, object]] = [
-    ("compose_nature.rain_particles_chance", 1),
-    ("compose_nature.snow_particles_chance", 1),
-    ("compose_nature.dust_particles_chance", 1),
-    ("compose_nature.leaf_particles_chance", 1),
-    ("compose_nature.marine_snow_particles_chance", 1),
     ("compose_nature.grass_chance", 1),
     ("compose_nature.ferns_chance", 1),
     ("compose_nature.monocots_chance", 1),
     ("compose_nature.flowers_chance", 1),
     ("compose_nature.pinecone_chance", 1),
     ("compose_nature.pine_needle_chance", 1),
+    ("compose_nature.rain_particles_chance", 1),
+    ("compose_nature.snow_particles_chance", 1),
+    ("compose_nature.dust_particles_chance", 1),
+    ("compose_nature.leaf_particles_chance", 1),
+    ("compose_nature.marine_snow_particles_chance", 1),
 ]
 
 # Directory where plain.gin lives — override .gin files are written here too
-GIN_CONFIG_DIR = Path("infinigen_examples/configs_nature/scene_types")
+GIN_CONFIG_DIR = Path("infinigen_examples/configs_nature")
 
 
 # =============================================================================
@@ -72,7 +72,7 @@ def create_override_gin(gin_key: str, value: object, label: str) -> Path:
         gin_value_str = str(value)
 
     gin_line = f"{gin_key} = {gin_value_str}\n"
-    gin_path = GIN_CONFIG_DIR / f"{label}.gin"
+    gin_path = GIN_CONFIG_DIR / f"searchspace.gin"
     gin_path.write_text(gin_line)
     print(f"[GIN] created override: {gin_path}  ({gin_line.strip()})")
     return gin_path
