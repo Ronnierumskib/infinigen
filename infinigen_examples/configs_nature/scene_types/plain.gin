@@ -42,7 +42,7 @@ compose_nature.ground_twigs_chance = 0 #0.7
 compose_nature.chopped_trees_chance = 0 #0.7
 compose_nature.rocks_chance = 0 #0.9
 
-compose_nature.grass_chance = 0 #0.8
+compose_nature.grass_chance = 1 #0.8
 compose_nature.ferns_chance = 0 #0.25
 compose_nature.monocots_chance = 0 # 0.15
 
