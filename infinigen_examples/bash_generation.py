@@ -24,7 +24,7 @@ from pathlib import Path
 #   ]
 # =============================================================================
 GIN_SEARCH_SPACE: list[tuple[str, object]] = [
-    '''
+
     ("compose_nature.grass_chance", 1),
     ("compose_nature.ferns_chance", 1),
     ("compose_nature.monocots_chance", 1),
@@ -36,8 +36,9 @@ GIN_SEARCH_SPACE: list[tuple[str, object]] = [
     ("compose_nature.dust_particles_chance", 1),
     ("compose_nature.leaf_particles_chance", 1),
     ("compose_nature.marine_snow_particles_chance", 1),
-    '''
+
 ]
+GIN_SEARCH_SPACE = 0
 
 # Directory where plain.gin lives — override .gin files are written here too
 GIN_CONFIG_DIR = Path("infinigen_examples/configs_nature")
