@@ -10,11 +10,10 @@ from pathlib import Path
 # =============================================================================
 # SEARCH SPACE DEFINITION
 # Define a list of (gin_key, value) tuples to explore. Each entry generates
-# one scene per run-index with that single parameter overriding plain.gin.
-# All variants for the same index share the same seed.
+# one scene per run-index with that single parameter overriding the default
+# config. All variants for the same index share the same seed.
 #
-# Leave the list EMPTY to disable search space mode and run normally
-# (plain.gin is never touched).
+# Leave the list EMPTY to disable search space mode and run normally.
 #
 # Examples:
 #   GIN_SEARCH_SPACE = [
@@ -38,16 +37,17 @@ GIN_SEARCH_SPACE: list[tuple[str, object]] = [
     ("compose_nature.pine_needle_chance", 1),
 ]
 
-PLAIN_GIN_PATH = Path("infinigen_examples/configs_nature/scene_types/plain.gin")
+# Directory where plain.gin lives — override .gin files are written here too
+GIN_CONFIG_DIR = Path("infinigen_examples/configs_nature/scene_types")
 
 
 # =============================================================================
-# GIN FILE HELPERS
+# GIN HELPERS
 # =============================================================================
 
 def gin_key_to_label(gin_key: str, value: object) -> str:
     """
-    Build a filesystem-safe suffix from a gin key + value.
+    Build a filesystem-safe label from a gin key + value.
     e.g. ("compose_nature.tree_density", 0.05) -> "tree_density_0.05"
     """
     short_key = gin_key.split(".")[-1]
@@ -61,38 +61,30 @@ def gin_key_to_label(gin_key: str, value: object) -> str:
     return f"{short_key}_{safe_value}"
 
 
-def overwrite_gin(gin_path: Path, gin_key: str, value: object):
+def create_override_gin(gin_key: str, value: object, label: str) -> Path:
     """
-    Overwrite gin_path in-place, replacing the line for gin_key with the
-    new value. If the key is not found, it is appended at the end.
+    Write a single-line .gin file to GIN_CONFIG_DIR/<label>.gin.
+    Returns the Path to the created file.
     """
-    original_text = gin_path.read_text()
-
     if isinstance(value, str):
         gin_value_str = f'"{value}"'
     else:
         gin_value_str = str(value)
 
-    new_line = f"{gin_key} = {gin_value_str}"
+    gin_line = f"{gin_key} = {gin_value_str}\n"
+    gin_path = GIN_CONFIG_DIR / f"{label}.gin"
+    gin_path.write_text(gin_line)
+    print(f"[GIN] created override: {gin_path}  ({gin_line.strip()})")
+    return gin_path
 
-    escaped_key = re.escape(gin_key)
-    pattern = re.compile(
-        rf"^([ \t]*{escaped_key}[ \t]*=[ \t]*.*)$",
-        re.MULTILINE,
-    )
 
-    if pattern.search(original_text):
-        modified_text = pattern.sub(new_line, original_text)
-        action = "replaced"
-    else:
-        modified_text = (
-            original_text.rstrip("\n")
-            + f"\n\n# [search space override]\n{new_line}\n"
-        )
-        action = "appended"
-
-    gin_path.write_text(modified_text)
-    print(f"[GIN] {action} '{gin_key}' -> {gin_value_str} in {gin_path}")
+def delete_override_gin(gin_path: Path):
+    """Delete the temporary override .gin file."""
+    try:
+        gin_path.unlink()
+        print(f"[GIN] deleted override: {gin_path}")
+    except FileNotFoundError:
+        pass
 
 
 # =============================================================================
@@ -101,12 +93,12 @@ def overwrite_gin(gin_path: Path, gin_key: str, value: object):
 
 def print_summary(results: dict):
     print("\n\n================ FINAL GENERATION SUMMARY ================")
-    print(f"\n{'Scene':<35} | Coarse | Populate | Fine | Road | Export")
-    print("-" * 75)
+    print(f"\n{'Scene':<40} | Coarse | Populate | Fine | Road | Export")
+    print("-" * 80)
 
     for scene_key, steps in results.items():
         print(
-            f"{scene_key:<35} |"
+            f"{scene_key:<40} |"
             f"   {steps['coarse']}    |"
             f"    {steps['populate']}     |"
             f"  {steps['fine']}   |"
@@ -144,10 +136,18 @@ def generate_scene(
     seed: int | None,
     summary: dict,
     summary_key: str,
+    override_gin_name: str | None = None,
 ):
     """
     Run all 5 generation steps for one scene.
-    plain.gin must already be correctly set before calling this.
+
+    Args:
+        idx:              Zero-padded scene index string, e.g. "00"
+        seed:             Integer seed, or None for random
+        summary:          Dict to record step outcomes into
+        summary_key:      Key used in summary dict and folder names
+        override_gin_name: Stem of the override .gin file (no extension),
+                          or None for normal mode. Appended last to -g args.
     """
     summary[summary_key] = {
         "coarse":   "-",
@@ -163,6 +163,8 @@ def generate_scene(
     print(f"{'#' * len(header)}")
     if seed is not None:
         print(f"    seed : {seed}")
+    if override_gin_name:
+        print(f"    gin override : {override_gin_name}.gin")
 
     coarse_dir  = f"outputs/Terrains/plain_coarse_{summary_key}"
     pop_dir     = f"outputs/Terrains/plain_pop_{summary_key}"
@@ -171,6 +173,12 @@ def generate_scene(
 
     seed_args = ["--seed", str(seed)] if seed is not None else []
 
+    # Base configs — override appended at the end if present
+    gin_configs = ["base_nature", "simple", "plain"]
+    if override_gin_name:
+        gin_configs.append(override_gin_name)
+    g_args = ["-g"] + gin_configs
+
     # ------------------------------------------------------------------
     # Step 1: Coarse terrain
     # ------------------------------------------------------------------
@@ -178,7 +186,7 @@ def generate_scene(
         sys.executable, "-m", "infinigen_examples.generate_nature",
         "--task", "coarse",
         *seed_args,
-        "-g", "base_nature", "simple", "plain",
+        *g_args,
         "--output_folder", coarse_dir,
     ]
     if not run_command(step1, "Step 1 (Coarse Terrain)"):
@@ -193,7 +201,7 @@ def generate_scene(
         sys.executable, "-m", "infinigen_examples.generate_nature",
         "--task", "populate",
         *seed_args,
-        "-g", "base_nature", "simple", "plain",
+        *g_args,
         "--input_folder",  coarse_dir,
         "--output_folder", pop_dir,
     ]
@@ -209,7 +217,7 @@ def generate_scene(
         sys.executable, "-m", "infinigen_examples.generate_nature",
         "--task", "fine_terrain",
         *seed_args,
-        "-g", "base_nature", "simple", "plain",
+        *g_args,
         "--input_folder",  pop_dir,
         "--output_folder", popfine_dir,
     ]
@@ -253,58 +261,49 @@ def generate_scene(
 def main(num_runs: int, start_idx: int, use_seed: bool):
     summary: dict = {}
 
-    # Back up plain.gin once at the start (only needed in search space mode,
-    # but harmless to do unconditionally)
-    original_gin = PLAIN_GIN_PATH.read_text()
+    if not GIN_CONFIG_DIR.exists():
+        print(f"[ERROR] GIN_CONFIG_DIR not found: {GIN_CONFIG_DIR}")
+        sys.exit(1)
 
-    try:
-        for i in range(start_idx, start_idx + num_runs):
-            idx  = f"{i:02d}"
-            seed = i if use_seed else None
+    for i in range(start_idx, start_idx + num_runs):
+        idx  = f"{i:02d}"
+        seed = i if use_seed else None
 
-            if GIN_SEARCH_SPACE:
-                # ------------------------------------------------------------
-                # SEARCH SPACE MODE
-                # One scene per config variant; all share the same seed.
-                # plain.gin is overwritten before each variant and restored
-                # to the original after all variants for this index are done.
-                # ------------------------------------------------------------
-                print(f"\n\n{'=' * 60}")
-                print(f"=== Scene {idx} — {len(GIN_SEARCH_SPACE)} config variant(s) ===")
-                print(f"{'=' * 60}")
+        if GIN_SEARCH_SPACE:
+            # ----------------------------------------------------------------
+            # SEARCH SPACE MODE
+            # ----------------------------------------------------------------
+            print(f"\n\n{'=' * 60}")
+            print(f"=== Scene {idx} — {len(GIN_SEARCH_SPACE)} config variant(s) ===")
+            print(f"{'=' * 60}")
 
-                for gin_key, value in GIN_SEARCH_SPACE:
-                    label       = gin_key_to_label(gin_key, value)
-                    summary_key = f"{idx}_{label}"
+            for gin_key, value in GIN_SEARCH_SPACE:
+                label       = gin_key_to_label(gin_key, value)
+                summary_key = f"{idx}_{label}"
 
-                    overwrite_gin(PLAIN_GIN_PATH, gin_key, value)
-
+                override_gin = create_override_gin(gin_key, value, label)
+                try:
                     generate_scene(
                         idx=idx,
                         seed=seed,
                         summary=summary,
                         summary_key=summary_key,
+                        override_gin_name=label,
                     )
+                finally:
+                    delete_override_gin(override_gin)
 
-                    # Restore after each variant so each starts from original
-                    PLAIN_GIN_PATH.write_text(original_gin)
-                    print(f"[GIN] plain.gin restored to original")
-
-            else:
-                # ------------------------------------------------------------
-                # NORMAL MODE — plain.gin untouched
-                # ------------------------------------------------------------
-                generate_scene(
-                    idx=idx,
-                    seed=seed,
-                    summary=summary,
-                    summary_key=idx,
-                )
-
-    finally:
-        # Guaranteed restore even if the script crashes or is interrupted
-        PLAIN_GIN_PATH.write_text(original_gin)
-        print(f"\n[GIN] plain.gin restored to original (finally block)")
+        else:
+            # ----------------------------------------------------------------
+            # NORMAL MODE
+            # ----------------------------------------------------------------
+            generate_scene(
+                idx=idx,
+                seed=seed,
+                summary=summary,
+                summary_key=idx,
+                override_gin_name=None,
+            )
 
     print_summary(summary)
 
@@ -313,24 +312,10 @@ if __name__ == "__main__":
     start_time = time.time()
 
     parser = argparse.ArgumentParser(description="Batch Infinigen terrain generation")
-    parser.add_argument(
-        "--num_runs",  type=int, required=True,
-        help="Number of scenes to generate",
-    )
-    parser.add_argument(
-        "--start_idx", type=int, default=0,
-        help="Starting index (default: 0)",
-    )
-    parser.add_argument(
-        "--s", type=int, default=0,
-        help="Use scene index as seed (1=on, 0=off, default: 0)",
-    )
+    parser.add_argument("--num_runs",  type=int, required=True, help="Number of scenes to generate")
+    parser.add_argument("--start_idx", type=int, default=0,     help="Starting index (default: 0)")
+    parser.add_argument("--s",         type=int, default=0,     help="Use scene index as seed (1=on, 0=off)")
 
     args = parser.parse_args()
-
-    if not PLAIN_GIN_PATH.exists():
-        print(f"[ERROR] plain.gin not found at: {PLAIN_GIN_PATH}")
-        sys.exit(1)
-
     main(args.num_runs, args.start_idx, bool(args.s))
     print("Bash generation executed in %s seconds" % (time.time() - start_time))
