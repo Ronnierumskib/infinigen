@@ -42,7 +42,7 @@ compose_nature.ground_twigs_chance = 0 #0.7
 compose_nature.chopped_trees_chance = 0 #0.7
 compose_nature.rocks_chance = 0 #0.9
 
-compose_nature.grass_chance = 1 #0.8
+compose_nature.grass_chance = 0 #0.8
 compose_nature.ferns_chance = 0 #0.25
 compose_nature.monocots_chance = 0 # 0.15
 
@@ -57,7 +57,7 @@ compose_nature.turbulence_chance = 0
 #Terrain.populated_bounds=(-1, 1, -1, 1, -1, 1)
 #Terrain.bounds=(-2, 2, -2, 2, -2, 2)
 # Terrain.build_terrain_bvh_and_attrs.avoid_border = True # Could help avoid generating large scenes.
-Terrain.populated_bounds=(-50, 50, -75, 75, -5, 25)
+Terrain.populated_bounds=(-100, 100, -150, 150, -5, 25)
 Terrain.bounds=(-1000, 1000, -1000, 1000, -400, 400)
 
 compose_nature.center_distance = 100 # Used for creatures. Useless atm.
@@ -86,16 +86,16 @@ fine_terrain.mesher_backend = "OcMesher" # Needed for FOV's larger than 90 deg
 Terrain.device='cuda'
 
 # Performance parameters
-OpaqueSphericalMesher.pixels_per_cube = 2 # 4 # High qual = 0.92 # VM optimal: 0.5
+OpaqueSphericalMesher.pixels_per_cube = 0.5 # 4 # High qual = 0.92 # VM optimal: 0.5
 TransparentSphericalMesher.pixels_per_cube = 1.38 # 4 # High qual = 1.38
 target_face_size.global_multiplier = 1 # 2
-OcMesher.pixels_per_cube = 2 # High qual=4, std=8 # VM optimal: 0.5
+OcMesher.pixels_per_cube = 0.5 # High qual=4, std=8 # VM optimal: 0.5
 
 execute_tasks.generate_resolution =  (960, 540) # Tried with: (480, 270)
 
 compose_nature.inview_distance = 200 # 35 control the maximum distance to scatter plants/rocks/medium-sized-objects
 placement.populate_all.dist_cull = 200 # 35 dist_cull: the max dist away from the camera to still populate assets
-placement.populate_all.vis_cull = 100 # 0 vis_cull: the max dist outside of the view frustrum to still populate assets
+placement.populate_all.vis_cull = 200 # 0 vis_cull: the max dist outside of the view frustrum to still populate assets
 compose_nature.near_distance = 200 # 10 controls the maximum distance to scatter tiny particles like pine needles
 
 # No creatures/particles
