@@ -6,14 +6,14 @@ Polls the VM over SSH, detects newly completed plain_usd_* scene folders,
 and scp's export_scene.blend down as each one finishes.
 
 Usage:
-    python watch_and_pull.py \\
-        --host 202.215.2.218 \\
-        --port 52838 \\
-        --user root \\
-        --remote_dir /workspace/infinigen/outputs/Terrains \\
-        --local_dir /mnt/c/vm_results \\
-        [--poll 30] \\
-        [--timeout 600]
+    python3 -m infinigen_examples.watch_and_pull \
+        --host 58.123.93.163 \
+        --port 40264 \
+        --user root \
+        --remote_dir /workspace/infinigen/outputs/Terrains \
+        --local_dir /mnt/c/vm_results \
+        --poll 30 \
+        --timeout 0
 
 Arguments:
     --host        VM IP address
@@ -99,7 +99,7 @@ def scp_scene(
     print("  " + " ".join(cmd))
 
     try:
-        result = subprocess.run(cmd, timeout=300)  # 5 min max per file
+        result = subprocess.run(cmd, timeout=3000)  # 50 min max per file
         if result.returncode == 0:
             print(f"[OK]   {scene_folder} -> {local_scene_dir}/export_scene.blend")
             return True
