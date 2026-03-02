@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
+"""
+num_runs defines how many scenes to create
+start_idx is the scene index to start at, end idx would be start_idx+num_runs
+--s is actually a bool. If its true/1, then the seed=scene idx. If false (default), then no seeding
+Usage:
+    call from ~/infinigen
+    python -m infinigen_examples.bash_generation --num_runs 1 --start_idx 14 --s 1
 
+
+"""
 import argparse
 import re
 import subprocess

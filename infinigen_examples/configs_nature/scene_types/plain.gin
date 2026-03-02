@@ -29,6 +29,37 @@ scene.warped_rocks_chance = 0
 
 # --- Added configs ---
 
+# Render options for modified render.py script:
+
+postprocess_bbox_annotations.enable_bbox_extraction = True
+postprocess_bbox_annotations.create_visualizations = True # For debugging
+
+# Minimum pixels for valid bbox
+# Lower values = detect smaller/more distant objects
+# Higher values = filter out tiny objects and reduce noise
+postprocess_bbox_annotations.min_pixel_threshold = 150
+
+flat_shading = True # For GT generation, required for segmentation masks
+
+# Ensure correct pass saving
+render_image.passes_to_save = [
+    ("object_index", "IndexOB"),  # Required for bbox extraction
+    ("z", "Depth"),
+    ("normal", "Normal"),
+    ("vector", "Vector"),
+]
+render_image.override_num_samples = 400  # Use 128+ for production. Can be enabled later
+
+
+
+# Bbox render class mapping (COCO format)
+# get_object_class_mapping.return_value = {
+#     "car": 2,
+#     "truck": 7,
+#     "bus": 5,
+# }
+
+
 # Scene assets. Removed to be generated individually, and used as distractors later in isaac-sim
 compose_nature.trees_chance = 0
 compose_nature.bushes_chance = 0
@@ -86,10 +117,10 @@ fine_terrain.mesher_backend = "OcMesher" # Needed for FOV's larger than 90 deg
 Terrain.device='cuda'
 
 # Performance parameters
-OpaqueSphericalMesher.pixels_per_cube = 0.5 # 4 # High qual = 0.92 # VM optimal: 0.5
-TransparentSphericalMesher.pixels_per_cube = 1.38 # 4 # High qual = 1.38
+OpaqueSphericalMesher.pixels_per_cube = 4 # 4 # High qual = 0.92 # VM optimal: 0.5
+TransparentSphericalMesher.pixels_per_cube = 4 # 4 # High qual = 1.38
 target_face_size.global_multiplier = 1 # 2
-OcMesher.pixels_per_cube = 0.5 # High qual=4, std=8 # VM optimal: 0.5
+OcMesher.pixels_per_cube = 4 # High qual=4, std=8 # VM optimal: 0.5
 
 execute_tasks.generate_resolution =  (960, 540) # Tried with: (480, 270)
 
@@ -104,7 +135,7 @@ compose_nature.flying_creatures_chance = 0.0
 compose_nature.fish_school_chance = 0.0
 compose_nature.bug_swarm_chance = 0.0
 
-compose_nature.rain_particles_chance = 0
+compose_nature.rain_particles_chance = 1
 compose_nature.snow_particles_chance = 0
 compose_nature.dust_particles_chance = 0
 compose_nature.leaf_particles_chance = 0
